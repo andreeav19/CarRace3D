@@ -21,6 +21,7 @@ const char* flowerColors[4] = { "pink", "blue", "red", "purple" };
 const char* color;
 
 float speed = 0.2;
+float carRotationAngle = 0;
 
 void changeSize(int w, int h)
 {
@@ -81,6 +82,14 @@ void drawFlower()
 	// Draw the center of the flower as a yellow sphere
 	glColor3f(1.0f, 1.0f, 0.0f); // Yellow color for the center
 	glutSolidSphere(radius * 0.2f, 20, 20);
+}
+
+void drawMainCar() {
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glPushMatrix();
+	glScalef(0.75, 0.9, 2);
+	glutSolidCube(0.25f);
+	glPopMatrix();
 }
 
 
@@ -158,6 +167,14 @@ void renderScene(void)
 				}
 			}
 	}
+
+	// draw main car
+	glPushMatrix();
+	glTranslatef(x, 0.825f, z);
+	glRotatef(0 - angle * 57.3, 0, 1, 0);
+	drawMainCar();
+	glPopMatrix();
+
 	glutPostRedisplay();
 	glutSwapBuffers();
 }
@@ -185,13 +202,13 @@ void moveCarBackwards() {
 }
 
 void turnRight() {
-	angle += 0.01f;
+	angle += 0.02f;
 	lx = sin(angle);
 	lz = -cos(angle);
 }
 
 void turnLeft() {
-	angle -= 0.01f;
+	angle -= 0.02f;
 	lx = sin(angle);
 	lz = -cos(angle);
 }
