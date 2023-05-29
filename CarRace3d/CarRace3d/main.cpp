@@ -20,8 +20,10 @@ float x = 0.0f, z = 5.0f;
 const char* flowerColors[4] = { "pink", "blue", "red", "purple" };
 const char* color;
 
-float speed = 0.2;
+float speed = 0.0;
 float carRotationAngle = 0;
+
+float roadPosition = 0.0f;
 
 void changeSize(int w, int h)
 {
@@ -92,6 +94,30 @@ void drawMainCar() {
 	glPopMatrix();
 }
 
+void drawIntermittentLines()
+{
+	glPushMatrix();
+	glTranslatef(0.0f, 0.00f, -roadPosition);
+
+	glColor3f(1.0f, 1.0f, 1.0f); // White color for the lines
+	glLineWidth(3.0f);
+
+	glBegin(GL_LINES);
+	for (int i = 0; i < 1500; i++) {
+		// First intermittent line
+		glVertex3f(-3.34, 0.0f, - i * 7);
+		glVertex3f(-3.34, 0.0f, - i * 7 + 5);
+
+		// Second intermittent line
+		glVertex3f(3.34, 0.0f, - i * 7);
+		glVertex3f(3.34, 0.0f, - i * 7 + 5);
+	}
+	glEnd();
+
+	glPopMatrix();
+}
+
+
 
 void renderScene(void)
 {
@@ -106,7 +132,11 @@ void renderScene(void)
 	// Set the camera
 	gluLookAt(x, 1.0f, z, x + lx, 1.0f, z + lz, 0.0f, 1.0f, 0.0f);
 
+	roadPosition -= speed;
+
 	// Draw gray road in the middle
+	glPushMatrix();
+	glTranslatef(0.0f, 0.0f, roadPosition);
 	glColor3f(0.5f, 0.5f, 0.5f);
 	glBegin(GL_QUADS);
 	glVertex3f(-10.0f, 0.0f, -100.0f);
@@ -114,21 +144,10 @@ void renderScene(void)
 	glVertex3f(10.0f, 0.0f, 100.0f);
 	glVertex3f(10.0f, 0.0f, -100.0f);
 	glEnd();
+	
 
-	// Draw intermittent lines on the gray road
-	glColor3f(1.0f, 1.0f, 1.0f); // White color for the lines
-	glLineWidth(3.0f);
-	glBegin(GL_LINES);
-	for (int i = 0; i < 18; i++) {
-		// First intermittent line
-		glVertex3f(-3.34, 0.01f, -100.0f + i * 7);
-		glVertex3f(-3.34, 0.01f, -100.0f + i * 7 + 5);
 
-		// Second intermittent line
-		glVertex3f(3.34, 0.01f, -100.0f + i * 7);
-		glVertex3f(3.34, 0.01f, -100.0f + i * 7 + 5);
-	}
-	glEnd();
+	drawIntermittentLines();
 
 	// Draw green grass on the left side of the road
 	glColor4f(0.0f, 0.5f, 0.0f, 0.8f);
@@ -146,6 +165,8 @@ void renderScene(void)
 	glVertex3f(100.0f, 0.0f, 100.0f);
 	glVertex3f(100.0f, 0.0f, -100.0f);
 	glEnd();
+
+	glPopMatrix(); // end road transition 
 
 	// Draw Flowers
 	float mi = 0.0; // multiply i
@@ -189,14 +210,17 @@ void keyboard(unsigned char key, int xx, int yy)
 void keyboardUp(unsigned char key, int x, int y)
 {
 	keys[key] = false; // set the corresponding element to false when a key is released
+	speed = 0;
 }
 
 void moveCarForwards() {
+	speed = 0.25;
 	x += lx * speed;
 	z += lz * speed;
 }
 
 void moveCarBackwards() {
+	speed = 0.25;
 	x -= lx * speed;
 	z -= lz * speed;
 }
