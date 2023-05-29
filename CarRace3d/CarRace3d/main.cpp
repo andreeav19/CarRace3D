@@ -20,6 +20,8 @@ float x = 0.0f, z = 5.0f;
 const char* flowerColors[4] = { "pink", "blue", "red", "purple" };
 const char* color;
 
+float speed = 0.2;
+
 void changeSize(int w, int h)
 {
 	// Prevent a divide by zero, when window is too short
@@ -156,50 +158,58 @@ void renderScene(void)
 				}
 			}
 	}
-
+	glutPostRedisplay();
 	glutSwapBuffers();
 }
 
+bool keys[256]; // array to store the state of each key
 
-
-void processNormalKeys(unsigned char key, int x, int y)
+void keyboard(unsigned char key, int xx, int yy)
 {
-	switch (key)
-	{
-	case 'l':
-		angle -= 0.01f;
-		lx = sin(angle);
-		lz = -cos(angle);
-		break;
-	}
-	if (key == 27)
-		exit(0);
+	keys[key] = true;
 }
 
-void processSpecialKeys(int key, int xx, int yy) {
+void keyboardUp(unsigned char key, int x, int y)
+{
+	keys[key] = false; // set the corresponding element to false when a key is released
+}
 
-	float fraction = 0.1f;
+void moveCarForwards() {
+	x += lx * speed;
+	z += lz * speed;
+}
 
-	switch (key)
-	{
-	case GLUT_KEY_LEFT:
-		angle -= 0.01f;
-		lx = sin(angle);
-		lz = -cos(angle);
-		break;
-	case GLUT_KEY_RIGHT:
-		angle += 0.01f;
-		lx = sin(angle);
-		lz = -cos(angle);
-		break;
-	case GLUT_KEY_UP:
-		x += lx * fraction;
-		z += lz * fraction;
-		break;
-	case GLUT_KEY_DOWN:
-		x -= lx * fraction;
-		z -= lz * fraction;
-		break;
+void moveCarBackwards() {
+	x -= lx * speed;
+	z -= lz * speed;
+}
+
+void turnRight() {
+	angle += 0.01f;
+	lx = sin(angle);
+	lz = -cos(angle);
+}
+
+void turnLeft() {
+	angle -= 0.01f;
+	lx = sin(angle);
+	lz = -cos(angle);
+}
+
+
+void handleKeys()
+{
+	if (keys['w']) {
+		moveCarForwards();
+	}
+	if (keys['s']) {
+		moveCarBackwards();
+	}
+	if (keys['d']) {
+		turnRight();
+	}
+	if (keys['a']) {
+		turnLeft();
 	}
 }
 
@@ -208,19 +218,21 @@ int main(int argc, char** argv)
 	// init GLUT and create window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowPosition(100, 100);
-	glutInitWindowSize(600, 600);
-	glutCreateWindow("Scena 3D cu oameni de zapada");
+	glutInitWindowPosition(100, 10);
+	glutInitWindowSize(1200, 768);
+	glutCreateWindow("Very cool 3D car game (nr.1 on steam, overwhelmingly positive reviews)");
+
+	// OpenGL init
+	glEnable(GL_DEPTH_TEST);
 
 	// register callbacks
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
 	glutIdleFunc(renderScene);
-	glutKeyboardFunc(processNormalKeys);
-	glutSpecialFunc(processSpecialKeys);
+	glutKeyboardFunc(keyboard);
+	glutKeyboardUpFunc(keyboardUp);
 
-	// OpenGL init
-	glEnable(GL_DEPTH_TEST);
+	glutIdleFunc(handleKeys);
 
 	// enter GLUT event processing cycle
 	glutMainLoop();
