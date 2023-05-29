@@ -1,173 +1,229 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+/* Deplasarea observatorului intr-o scena 3D
+SURSA:  lighthouse3D:  http://www.lighthouse3d.com/tutorials/glut-tutorial/keyboard-example-moving-around-the-world/
+Elemente de retinut:
+- folosirea functiilor de desenare pentru a schita obiecte 3D
+- schimbarea pozitiei observatorului se face in functia gluLookAt
+- folosirea glutSpecialFunc si glutKeyboardFunc pentru interactiunea cu tastatura
+*/
+
+#include<gl/freeglut.h>
+#include<math.h>
 #include <iostream>
+using namespace std;
+// angle of rotation for the camera direction
+float angle = 0.0;
+// actual vector representing the camera's direction
+float lx = 0.0f, lz = -1.0f;
+// XZ position of the camera
+float x = 0.0f, z = 5.0f;
 
-#include "loadShaders.h"
+const char* flowerColors[4] = { "pink", "blue", "red", "purple" };
+const char* color;
 
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
-GLFWwindow *createWindow (int width, int height, const char *title);
-void genBuffers ();
-void delBuffers ();
-void renderLoop ();
-void initGlfw ();
-void initGlad ();
-
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
-
-// globals
-unsigned int VBO, VAO, EBO;
-GLuint shaderProgram;
-GLFWwindow *window;
-
-int main()
+void changeSize(int w, int h)
 {
-    initGlfw ();
-    window = createWindow (SCR_WIDTH, SCR_HEIGHT, "Grafica pe calculator");
-    initGlad ();
-    shaderProgram = LoadShaders ("example.vert", "example.frag");
-    genBuffers ();
+	// Prevent a divide by zero, when window is too short
+	// (you cant make a window of zero width).
+	if (h == 0)
+		h = 1;
+	float ratio = w * 1.0 / h;
 
-    renderLoop ();
+	// Use the Projection Matrix
+	glMatrixMode(GL_PROJECTION);
 
-    delBuffers ();
-    glfwTerminate();
+	// Reset Matrix
+	glLoadIdentity();
 
-    return 0;
+	// Set the viewport to be the entire window
+	glViewport(0, 0, w, h);
+
+	// Set the correct perspective.
+	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+
+	// Get Back to the Modelview
+	glMatrixMode(GL_MODELVIEW);
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
+void drawFlower()
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+	float radius = 0.5f;
+	int numPetals = 5;
+	float angleIncrement = 360.0f / numPetals;
+
+	if (strcmp(color, "blue") == 0)
+		glColor3f(0.04, 0.54, 0.99);
+	else if (strcmp(color, "pink") == 0)
+		glColor3f(0.99, 0.58, 0.94);
+	else if (strcmp(color, "red") == 0)
+		glColor3f(1, 0.11, 0.33);
+	else if (strcmp(color, "purple") == 0)
+		glColor3f(0.71, 0.18, 0.79);
+
+	// Draw the petals
+	for (int i = 0; i < numPetals; i++)
+	{
+		glPushMatrix();
+
+		// Rotate each petal around the center of the flower
+		glRotatef(i * angleIncrement, 0.0f, 0.0f, 1.0f);
+
+		// Translate to the position of the petal
+		glTranslatef(radius * 0.2, 0.0f, 0.0f);
+
+		// Draw the petal as a sphere
+		glutSolidSphere(0.1f, 10, 10);
+
+		glPopMatrix();
+	}
+
+	// Draw the center of the flower as a yellow sphere
+	glColor3f(1.0f, 1.0f, 0.0f); // Yellow color for the center
+	glutSolidSphere(radius * 0.2f, 20, 20);
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+
+void renderScene(void)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
+	glClearColor(0.51, 0.78, 0.78, 1.0);
+
+	// Clear Color and Depth Buffers
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Reset transformations
+	glLoadIdentity();
+
+	// Set the camera
+	gluLookAt(x, 1.0f, z, x + lx, 1.0f, z + lz, 0.0f, 1.0f, 0.0f);
+
+	// Draw gray road in the middle
+	glColor3f(0.5f, 0.5f, 0.5f);
+	glBegin(GL_QUADS);
+	glVertex3f(-10.0f, 0.0f, -100.0f);
+	glVertex3f(-10.0f, 0.0f, 100.0f);
+	glVertex3f(10.0f, 0.0f, 100.0f);
+	glVertex3f(10.0f, 0.0f, -100.0f);
+	glEnd();
+
+	// Draw intermittent lines on the gray road
+	glColor3f(1.0f, 1.0f, 1.0f); // White color for the lines
+	glLineWidth(3.0f);
+	glBegin(GL_LINES);
+	for (int i = 0; i < 18; i++) {
+		// First intermittent line
+		glVertex3f(-3.34, 0.01f, -100.0f + i * 7);
+		glVertex3f(-3.34, 0.01f, -100.0f + i * 7 + 5);
+
+		// Second intermittent line
+		glVertex3f(3.34, 0.01f, -100.0f + i * 7);
+		glVertex3f(3.34, 0.01f, -100.0f + i * 7 + 5);
+	}
+	glEnd();
+
+	// Draw green grass on the left side of the road
+	glColor4f(0.0f, 0.5f, 0.0f, 0.8f);
+	glBegin(GL_QUADS);
+	glVertex3f(-100.0f, 0.0f, -100.0f);
+	glVertex3f(-100.0f, 0.0f, 100.0f);
+	glVertex3f(-10.0f, 0.0f, 100.0f);
+	glVertex3f(-10.0f, 0.0f, -100.0f);
+	glEnd();
+
+	// Draw green grass on the right side of the road
+	glBegin(GL_QUADS);
+	glVertex3f(10.0f, 0.0f, -100.0f);
+	glVertex3f(10.0f, 0.0f, 100.0f);
+	glVertex3f(100.0f, 0.0f, 100.0f);
+	glVertex3f(100.0f, 0.0f, -100.0f);
+	glEnd();
+
+	// Draw Flowers
+	float mi = 0.0; // multiply i
+	for (int c = 0; c < 4; c++) {
+		color = flowerColors[c];
+		mi = mi + 2.0;
+		for (int i = -5; i < 5; i++)
+			for (int j = -5; j < 5; j++)
+			{
+				if (i * mi < -10 || i * mi > 10) {
+					glPushMatrix();
+					glTranslatef(i * mi, 0.05f, j * mi);
+					glScalef(0.5, 0.5, 0.5);
+					glRotatef(90.0, 1.0, 0.0, 0.0);
+					drawFlower();
+					glPopMatrix();
+					glPopMatrix();
+					glPopMatrix();
+				}
+			}
+	}
+
+	glutSwapBuffers();
 }
 
-GLFWwindow *createWindow (int width, int height, const char *title)
-{
-    // glfw window creation
-    // --------------------
-    GLFWwindow* window = glfwCreateWindow(width, height, title, NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return NULL;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    return window;
+
+void processNormalKeys(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+	case 'l':
+		angle -= 0.01f;
+		lx = sin(angle);
+		lz = -cos(angle);
+		break;
+	}
+	if (key == 27)
+		exit(0);
 }
 
-void genBuffers ()
-{
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    float vertices[] = {
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
-    };
-    unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 3,  // first Triangle
-        1, 2, 3   // second Triangle
-    };
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
+void processSpecialKeys(int key, int xx, int yy) {
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	float fraction = 0.1f;
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-
-    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0); 
+	switch (key)
+	{
+	case GLUT_KEY_LEFT:
+		angle -= 0.01f;
+		lx = sin(angle);
+		lz = -cos(angle);
+		break;
+	case GLUT_KEY_RIGHT:
+		angle += 0.01f;
+		lx = sin(angle);
+		lz = -cos(angle);
+		break;
+	case GLUT_KEY_UP:
+		x += lx * fraction;
+		z += lz * fraction;
+		break;
+	case GLUT_KEY_DOWN:
+		x -= lx * fraction;
+		z -= lz * fraction;
+		break;
+	}
 }
 
-void delBuffers ()
+int main(int argc, char** argv)
 {
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-    glDeleteProgram(shaderProgram);
-}
+	// init GLUT and create window
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowPosition(100, 100);
+	glutInitWindowSize(600, 600);
+	glutCreateWindow("Scena 3D cu oameni de zapada");
 
-void renderLoop ()
-{
-    while (!glfwWindowShouldClose(window))
-    {
-        // input
-        // -----
-        processInput(window);
+	// register callbacks
+	glutDisplayFunc(renderScene);
+	glutReshapeFunc(changeSize);
+	glutIdleFunc(renderScene);
+	glutKeyboardFunc(processNormalKeys);
+	glutSpecialFunc(processSpecialKeys);
 
-        // render
-        // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+	// OpenGL init
+	glEnable(GL_DEPTH_TEST);
 
-        // draw our first triangle
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-                                //glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // glBindVertexArray(0); // no need to unbind it every time 
+	// enter GLUT event processing cycle
+	glutMainLoop();
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-}
-
-void initGlfw ()
-{
-    // glfw: initialize and configure
-    // ------------------------------
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-}
-
-void initGlad ()
-{
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return;
-    }
+	return 1;
 }
