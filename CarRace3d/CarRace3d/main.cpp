@@ -23,6 +23,8 @@ const char* color;
 float speed = 0.2;
 float carRotationAngle = 0;
 
+float PI = 3.14;
+
 void changeSize(int w, int h)
 {
 	// Prevent a divide by zero, when window is too short
@@ -90,6 +92,98 @@ void drawMainCar() {
 	glScalef(0.75, 0.9, 2);
 	glutSolidCube(0.25f);
 	glPopMatrix();
+}
+
+void drawCoin(float radius, float height, int sides) {
+	float angle;
+	float x, y;
+	float step = 2.0f * PI / sides;
+
+	glColor3f(1, 0.84, 0.33);
+
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < sides; i++) {
+		angle = i * step;
+		x = 0.15 * cosf(angle);
+		y = 0.20 * sinf(angle);
+		glVertex3f(x, y, 0.0f);
+	}
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < sides; i++) {
+		angle = i * step;
+		x = 0.15 * cosf(angle);
+		y = 0.20 * sinf(angle);
+		glVertex3f(x, y, height);
+	}
+	glEnd();
+
+	glBegin(GL_QUAD_STRIP);
+	for (int i = 0; i <= sides; i++) {
+		angle = i * step;
+		x = 0.15 * cosf(angle);
+		y = 0.20 * sinf(angle);
+		glVertex3f(x, y, 0.0f);
+		glVertex3f(x, y, height);
+	}
+	glEnd();
+
+	glColor3f(0.92, 0.71, 0.17);
+
+	// Draw model on the front of the coin
+
+	glLineWidth(0.2);
+	glBegin(GL_LINE_LOOP);
+	for (int index = 0; index <= sides; index++) {
+		float angle = index * 2.0f * PI / sides;
+		float cx = 0.13 * cosf(angle);
+		float cy = 0.18 * sinf(angle);
+		glVertex3f(cx, cy, height + 0.001);
+	}
+	glEnd();
+
+	// draw crown
+	glBegin(GL_POLYGON);
+	glVertex3f(0, 0, height + 0.001);
+	glVertex3f(-0.08, 0.02, height + 0.001);
+	glVertex3f(-0.04, -0.02, height + 0.001);
+	glVertex3f(0.0, 0.06, height + 0.001);
+	glVertex3f(0.04, -0.02, height + 0.001);
+	glVertex3f(0.08, 0.02, height + 0.001);
+	glVertex3f(0.08, -0.06, height + 0.001);
+	glVertex3f(-0.08, -0.06, height + 0.001);
+	glVertex3f(-0.08, 0.02, height + 0.001);
+
+	glEnd();
+
+	// Draw model on the back of the coin
+
+	// Draw model on the back of the coin
+
+	glLineWidth(0.2);
+	glBegin(GL_LINE_LOOP);
+	for (int index = 0; index <= sides; index++) {
+		float angle = index * 2.0f * PI / sides;
+		float cx = 0.13 * cosf(angle);
+		float cy = 0.18 * sinf(angle);
+		glVertex3f(cx, cy, -0.001);
+	}
+	glEnd();
+
+	// draw crown
+	glBegin(GL_POLYGON);
+	glVertex3f(0, 0, -0.001);
+	glVertex3f(-0.08, 0.02, -0.001);
+	glVertex3f(-0.04, -0.02, -0.001);
+	glVertex3f(0.0, 0.06, -0.001);
+	glVertex3f(0.04, -0.02, -0.001);
+	glVertex3f(0.08, 0.02, -0.001);
+	glVertex3f(0.08, -0.06, -0.001);
+	glVertex3f(-0.08, -0.06, -0.001);
+	glVertex3f(-0.08, 0.02, -0.001);
+
+	glEnd();
 }
 
 
@@ -167,6 +261,12 @@ void renderScene(void)
 				}
 			}
 	}
+
+	// draw coin - if u want to see it i mean
+	glPushMatrix();
+	glTranslatef(0, 0.5, -7);
+	drawCoin(0.5, 0.05, 50);
+	glPopMatrix();
 
 	// draw main car
 	glPushMatrix();
