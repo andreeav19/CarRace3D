@@ -119,7 +119,7 @@ void renderScene(void)
 	glColor3f(1.0f, 1.0f, 1.0f); // White color for the lines
 	glLineWidth(3.0f);
 	glBegin(GL_LINES);
-	for (int i = 0; i < 18; i++) {
+	for (int i = 0; i < 28; i++) {
 		// First intermittent line
 		glVertex3f(-3.34, 0.01f, -100.0f + i * 7);
 		glVertex3f(-3.34, 0.01f, -100.0f + i * 7 + 5);
@@ -151,7 +151,7 @@ void renderScene(void)
 	float mi = 0.0; // multiply i
 	for (int c = 0; c < 4; c++) {
 		color = flowerColors[c];
-		mi = mi + 2.0;
+		mi = mi + 5.0;
 		for (int i = -5; i < 5; i++)
 			for (int j = -5; j < 5; j++)
 			{
