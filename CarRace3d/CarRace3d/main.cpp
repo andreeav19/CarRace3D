@@ -44,6 +44,8 @@ float fuelPosZ = -150;
 
 int points = 0;
 
+float fuel = 100;
+
 float PI = 3.14;
 
 // textures
@@ -585,9 +587,23 @@ void drawSkybox()
 	glPopAttrib();
 }
 
+void drawMeter(GLfloat value) {
+
+	// Draw the meter fill
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glBegin(GL_QUADS);
+	glVertex2f(400.0, 5.0);
+	glVertex2f(400.0, 10.0);
+	glVertex2f(400.0 + value, 10.0);
+	glVertex2f(400.0 + value, 5.0);
+	glEnd();
+
+	glPopMatrix();
+}
 
 void renderScene(void)
 {
+	fuel -= 0.1;
 	glClearColor(0.51, 0.78, 0.78, 1.0);
 
 	// Clear Color and Depth Buffers
@@ -749,9 +765,11 @@ void renderScene(void)
 	if (fuelCollision) {
 		// handle fuel collision
 		fuelCollision = false;
+		fuel = 100;
 	}
 
-	if (carCollision) {
+
+	if (carCollision || fuel <= 0) {
 		glDisable(GL_LIGHTING);
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
@@ -809,6 +827,7 @@ void renderScene(void)
 	glRasterPos2i(580, 10); // Set position
 	std::string pointsString = "Points: " + std::to_string(points);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(pointsString.c_str()));
+	drawMeter(fuel);
 
 	// Re-enable depth testing
 	glEnable(GL_DEPTH_TEST);
