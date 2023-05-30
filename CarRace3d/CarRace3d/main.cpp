@@ -94,7 +94,8 @@ void drawMainCar() {
 	glPopMatrix();
 }
 
-void drawCoin(float radius, float height, int sides) {
+void drawCoin() {
+	float radius = 0.5, height = 0.05, sides = 50;
 	float angle;
 	float x, y;
 	float step = 2.0f * PI / sides;
@@ -159,8 +160,6 @@ void drawCoin(float radius, float height, int sides) {
 
 	// Draw model on the back of the coin
 
-	// Draw model on the back of the coin
-
 	glLineWidth(0.2);
 	glBegin(GL_LINE_LOOP);
 	for (int index = 0; index <= sides; index++) {
@@ -184,6 +183,91 @@ void drawCoin(float radius, float height, int sides) {
 	glVertex3f(-0.08, 0.02, -0.001);
 
 	glEnd();
+}
+
+void drawFuelTank() {
+	float height = 0.8f;
+	float sides = 50;
+	float angle;
+	float x, y;
+	float step = 2.0f * PI / sides;
+
+	glColor3f(1, 0.0, 0.0);
+
+	glPushMatrix();
+	glRotatef(90, 1, 0, 0);
+
+	// Draw body
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < sides; i++) {
+		angle = i * step;
+		x = 0.5 * cosf(angle);
+		y = 0.3 * sinf(angle);
+		glVertex3f(x, y, 0.0f);
+	}
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < sides; i++) {
+		angle = i * step;
+		x = 0.5 * cosf(angle);
+		y = 0.3 * sinf(angle);
+		glVertex3f(x, y, height);
+	}
+	glEnd();
+
+	glBegin(GL_QUAD_STRIP);
+	for (int i = 0; i <= sides; i++) {
+		angle = i * step;
+		x = 0.5 * cosf(angle);
+		y = 0.3 * sinf(angle);
+		glVertex3f(x, y, 0.0f);
+		glVertex3f(x, y, height);
+	}
+	glEnd();
+
+
+	// Draw handle
+	glPushMatrix();
+	glTranslatef(0.6, 0, 0.4);
+	glScalef(0.05, 0.05, 0.4);
+	glutSolidCube(1.0f);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.55, 0, 0.2);
+	glScalef(0.15, 0.05, 0.15);
+	glutSolidCube(1.0f);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.55, 0.0, 0.6);
+	glScalef(0.15, 0.05, 0.15);
+	glutSolidCube(1.0f);
+	glPopMatrix();
+
+	// Draw cap
+	glColor3f(0.0, 0.0, 0.0);
+	glPushMatrix();
+	glTranslatef(-0.3, 0.0, -0.1);
+	glutSolidCylinder(0.05, 0.1, 50, 20);
+	glPopMatrix();
+
+	void* font = GLUT_STROKE_ROMAN;
+
+	// Set the size of the letter
+	float letterSize = 0.004;
+
+	// Set the position of the letter
+
+	glPushMatrix();
+	glTranslatef(-0.1, 0.301, 0.6);
+	glRotatef(-90.0, 1.0, 0.0, 0.0);
+	glScalef(letterSize, letterSize, 1.0);
+	glutStrokeCharacter(font, 'F');
+	glPopMatrix();
+
+	glPopMatrix();
 }
 
 
@@ -264,8 +348,9 @@ void renderScene(void)
 
 	// draw coin - if u want to see it i mean
 	glPushMatrix();
-	glTranslatef(0, 0.5, -7);
-	drawCoin(0.5, 0.05, 50);
+	glTranslatef(0, 1.0, -7);
+	drawCoin();
+	// drawFuelTank();
 	glPopMatrix();
 
 	// draw main car
