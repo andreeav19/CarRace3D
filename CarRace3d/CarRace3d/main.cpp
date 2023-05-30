@@ -20,7 +20,7 @@ float x = 0.0f, z = 5.0f;
 const char* flowerColors[4] = { "pink", "blue", "red", "purple" };
 const char* color;
 
-float speed = 0.2;
+float speed = 0.0;
 float carRotationAngle = 0;
 
 float PI = 3.14;
@@ -284,13 +284,16 @@ void renderScene(void)
 	// Set the camera
 	gluLookAt(x, 1.0f, z, x + lx, 1.0f, z + lz, 0.0f, 1.0f, 0.0f);
 
+	float visibleRoadStartZ = z - 100.0f;
+	float visibleRoadEndZ = z + 100.0f;
+
 	// Draw gray road in the middle
 	glColor3f(0.5f, 0.5f, 0.5f);
 	glBegin(GL_QUADS);
-	glVertex3f(-10.0f, 0.0f, -100.0f);
-	glVertex3f(-10.0f, 0.0f, 100.0f);
-	glVertex3f(10.0f, 0.0f, 100.0f);
-	glVertex3f(10.0f, 0.0f, -100.0f);
+	glVertex3f(-10.0f, 0.0f, visibleRoadStartZ);
+	glVertex3f(-10.0f, 0.0f, visibleRoadEndZ);
+	glVertex3f(10.0f, 0.0f, visibleRoadEndZ);
+	glVertex3f(10.0f, 0.0f, visibleRoadStartZ);
 	glEnd();
 
 	// Draw intermittent lines on the gray road
@@ -311,18 +314,18 @@ void renderScene(void)
 	// Draw green grass on the left side of the road
 	glColor4f(0.0f, 0.5f, 0.0f, 0.8f);
 	glBegin(GL_QUADS);
-	glVertex3f(-100.0f, 0.0f, -100.0f);
-	glVertex3f(-100.0f, 0.0f, 100.0f);
-	glVertex3f(-10.0f, 0.0f, 100.0f);
-	glVertex3f(-10.0f, 0.0f, -100.0f);
+	glVertex3f(-100.0f, 0.0f, visibleRoadStartZ);
+	glVertex3f(-100.0f, 0.0f, visibleRoadEndZ);
+	glVertex3f(-10.0f, 0.0f, visibleRoadEndZ);
+	glVertex3f(-10.0f, 0.0f, visibleRoadStartZ);
 	glEnd();
 
 	// Draw green grass on the right side of the road
 	glBegin(GL_QUADS);
-	glVertex3f(10.0f, 0.0f, -100.0f);
-	glVertex3f(10.0f, 0.0f, 100.0f);
-	glVertex3f(100.0f, 0.0f, 100.0f);
-	glVertex3f(100.0f, 0.0f, -100.0f);
+	glVertex3f(10.0f, 0.0f, visibleRoadStartZ);
+	glVertex3f(10.0f, 0.0f, visibleRoadEndZ);
+	glVertex3f(100.0f, 0.0f, visibleRoadEndZ);
+	glVertex3f(100.0f, 0.0f, visibleRoadStartZ);
 	glEnd();
 
 	// Draw Flowers
@@ -330,7 +333,7 @@ void renderScene(void)
 	for (int c = 0; c < 4; c++) {
 		color = flowerColors[c];
 		mi = mi + 5.0;
-		for (int i = -5; i < 5; i++)
+		for (int i = -4; i < 5; i++)
 			for (int j = -5; j < 5; j++)
 			{
 				if (i * mi < -10 || i * mi > 10) {
@@ -374,14 +377,17 @@ void keyboard(unsigned char key, int xx, int yy)
 void keyboardUp(unsigned char key, int x, int y)
 {
 	keys[key] = false; // set the corresponding element to false when a key is released
+	speed = 0;
 }
 
 void moveCarForwards() {
+	speed = 0.3;
 	x += lx * speed;
 	z += lz * speed;
 }
 
 void moveCarBackwards() {
+	speed = 0.3;
 	x -= lx * speed;
 	z -= lz * speed;
 }
