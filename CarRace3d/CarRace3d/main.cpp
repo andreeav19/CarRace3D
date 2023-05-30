@@ -15,13 +15,17 @@ float angle = 0.0;
 // actual vector representing the camera's direction
 float lx = 0.0f, lz = -1.0f;
 // XZ position of the camera
-float x = 0.0f, z = 5.0f;
+float x = 0.0f, z = 0.0f;
 
 const char* flowerColors[4] = { "pink", "blue", "red", "purple" };
 const char* color;
 
 float speed = 0.4;
 float carRotationAngle = 0;
+
+float oppositeCarZ = 0;
+float oppositeCarXArr[3] = { -6.5, 0, 6.5 };
+float oppositeCarX = oppositeCarXArr[rand() % 3];
 
 float PI = 3.14;
 
@@ -92,6 +96,11 @@ void drawMainCar() {
 	glScalef(0.75, 0.9, 2);
 	glutSolidCube(0.25f);
 	glPopMatrix();
+}
+
+void drawOpposingCar() {
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glutSolidCube(1.5f);
 }
 
 void drawCoin() {
@@ -382,6 +391,26 @@ void renderScene(void)
 	glTranslatef(0, 1.0, -7);
 	drawCoin();
 	// drawFuelTank();
+
+	//draw oposing car
+	if (z <= 0) {
+		oppositeCarZ += speed + 0.25;
+	}
+	else {
+		oppositeCarZ -= speed + 0.25;
+	}
+	glPopMatrix();
+	if (oppositeCarZ > visibleRoadEndZ) {
+		oppositeCarZ = visibleRoadStartZ;
+		oppositeCarX = oppositeCarXArr[rand() % 3];
+	}
+	else if (oppositeCarZ < visibleRoadStartZ) {
+		oppositeCarZ = visibleRoadEndZ;
+		oppositeCarX = oppositeCarXArr[rand() % 3];
+	}
+	glPushMatrix();
+	glTranslatef(oppositeCarX, 0.1, oppositeCarZ);
+	drawOpposingCar();
 	glPopMatrix();
 
 	// draw main car
