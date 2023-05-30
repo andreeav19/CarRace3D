@@ -8,6 +8,7 @@ Elemente de retinut:
 
 #include<gl/freeglut.h>
 #include<math.h>
+#include <string>
 #include <iostream>
 #include "SOIL.h"
 
@@ -39,6 +40,8 @@ float coinPosZ = -50;
 float fuelPosXArr[3] = { -6.5, 0, 6.5 };
 float fuelPosX = fuelPosXArr[rand() % 3];
 float fuelPosZ = -150;
+
+int points = 0;
 
 float PI = 3.14;
 
@@ -640,6 +643,7 @@ void renderScene(void)
 	if (coinCollision) {
 		// handle coin collision
 		coinCollision = false;
+		points += 100;
 	}
 
 	if (fuelCollision) {
@@ -657,6 +661,33 @@ void renderScene(void)
 	glTranslatef(x, 0.825f, z);
 	glRotatef(0 - angle * 57.3, 0, 1, 0);
 	drawMainCar();
+	glPopMatrix();
+
+	// Switch to 2D rendering mode
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(0, 1200, 0, 768);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// Disable depth testing to render the UI element on top
+	glDisable(GL_DEPTH_TEST);
+
+	// Render the UI element here
+	// Example: Render a simple point counter at the top left corner
+	glRasterPos2i(580, 10); // Set position
+	std::string pointsString = "Points: " + std::to_string(points);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(pointsString.c_str()));
+
+	// Re-enable depth testing
+	glEnable(GL_DEPTH_TEST);
+
+	// Restore the original projection and modelview matrices
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 
 	glutPostRedisplay();
