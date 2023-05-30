@@ -132,17 +132,42 @@ void drawCoin() {
 
 	glColor3f(0.92, 0.71, 0.17);
 
-	// Draw model on the front of the coin
+	// Define control points for the two ovals
+	// First oval
+	GLdouble controlPoints1[8][3] = {
+		{0.0, -0.2, height + 0.001},
+		{0.2, -0.2, height + 0.001},
+		{0.2, 0.2, height + 0.001},
+		{0.0, 0.2, height + 0.001},
+		{0.0, 0.2, height + 0.001},
+		{-0.2, 0.2, height + 0.001},
+		{-0.2, -0.2, height + 0.001},
+		{0.0, -0.2, height + 0.001}
+	};
 
-	glLineWidth(0.2);
-	glBegin(GL_LINE_LOOP);
-	for (int index = 0; index <= sides; index++) {
-		float angle = index * 2.0f * PI / sides;
-		float cx = 0.13 * cosf(angle);
-		float cy = 0.18 * sinf(angle);
-		glVertex3f(cx, cy, height + 0.001);
-	}
-	glEnd();
+	// Second oval
+	GLdouble controlPoints2[8][3] = {
+		{0.0, -0.2, -0.001},
+		{0.2, -0.2, -0.001},
+		{0.2, 0.2, -0.001},
+		{0.0, 0.2, -0.001},
+		{0.0, 0.2, -0.001},
+		{-0.2, 0.2, -0.001},
+		{-0.2, -0.2, -0.001},
+		{0.0, -0.2, -0.001}
+	};
+
+	// Draw model on the front of the coin
+	// Draw first oval on the front
+	glPushMatrix();
+	glTranslatef(0.0, 0.025, 0.0);
+
+	glMap1d(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 8, &controlPoints1[0][0]);
+	glEnable(GL_MAP1_VERTEX_3);
+	glMapGrid1d(100, 0.0, 1.0);
+	glEvalMesh1(GL_LINE, 0, 100);
+
+	glPopMatrix();
 
 	// draw crown
 	glBegin(GL_POLYGON);
@@ -159,16 +184,16 @@ void drawCoin() {
 	glEnd();
 
 	// Draw model on the back of the coin
+	// Draw second oval on the back
+	glPushMatrix();
+	glTranslatef(0.0, 0.025, 0.0);
 
-	glLineWidth(0.2);
-	glBegin(GL_LINE_LOOP);
-	for (int index = 0; index <= sides; index++) {
-		float angle = index * 2.0f * PI / sides;
-		float cx = 0.13 * cosf(angle);
-		float cy = 0.18 * sinf(angle);
-		glVertex3f(cx, cy, -0.001);
-	}
-	glEnd();
+	glMap1d(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 8, &controlPoints2[0][0]);
+	glEnable(GL_MAP1_VERTEX_3);
+	glMapGrid1d(100, 0.0, 1.0);
+	glEvalMesh1(GL_LINE, 0, 100);
+
+	glPopMatrix();
 
 	// draw crown
 	glBegin(GL_POLYGON);
