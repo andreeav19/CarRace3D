@@ -9,6 +9,8 @@ Elemente de retinut:
 #include<gl/freeglut.h>
 #include<math.h>
 #include <iostream>
+#include "SOIL.h"
+
 using namespace std;
 // angle of rotation for the camera direction
 float angle = 0.0;
@@ -35,6 +37,9 @@ float coinPosZ = -50;
 
 
 float PI = 3.14;
+
+// textures
+GLuint grassTexture, roadTexture, skyTexture, cityTexture;
 
 void changeSize(int w, int h)
 {
@@ -98,16 +103,87 @@ void drawFlower()
 }
 
 void drawMainCar() {
+	glPushAttrib(GL_LIGHTING_BIT | GL_BLEND);
+
+	GLfloat shadowAmbient[] = { 0.2f, 0.2f, 0.2f, 0.5f };
+	GLfloat shadowDiffuse[] = { 0.2f, 0.2f, 0.2f, 0.5f };
+	GLfloat shadowSpecular[] = { 0.0f, 0.0f, 0.0f, 0.5f };
+	GLfloat shadowShininess = 0.0f;
+
+	GLfloat mat_ambient[] = { 0.7f, 0.0f, 0.0f, 1.0f };
+	GLfloat mat_diffuse[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat mat_shininess[] = { 50.0f };
+
+	// Set car's material properties
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+	// Draw the car
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glPushMatrix();
 	glScalef(0.75, 0.9, 2);
 	glutSolidCube(0.25f);
 	glPopMatrix();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Draw shadow in front of the car
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, shadowAmbient);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, shadowDiffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, shadowSpecular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shadowShininess);
+	glTranslatef(0.1f, 0.01f, -0.5f);
+	glScalef(1.5f, 0.0f, 3.0f);
+	glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+	glutSolidCube(0.25f);
+	glPopMatrix();
+
+	glDisable(GL_BLEND);
+
+	// Reset car's material properties
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+	// Draw the car again
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glPushMatrix();
+	glScalef(0.75, 0.9, 2);
+	glutSolidCube(0.25f);
+	glPopMatrix();
+
+	glPopAttrib();
+}
+
+void setLight(void) {
+	GLfloat ambientLumina[] = { 0.7f, 0.7f, 0.6f, 1.0f };
+	GLfloat difuzLumina[] = { 1.0f, 1.0f, 0.9f, 1.0f };;
+	GLfloat alb[] = { 1.0, 1.0, 1.0, 0.0 };
+	GLfloat directieSpot[] = { x - lx, 1.0f, z - lz, 1.0f };
+
+	// Enable lighting
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glShadeModel(GL_SMOOTH);
+
+	// Set light properties
+	glLightfv(GL_LIGHT0, GL_POSITION, directieSpot);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLumina);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, difuzLumina);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, alb);
 }
 
 void drawOpposingCar() {
+	glDisable(GL_LIGHTING);
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glutSolidCube(1.5f);
+	glEnable(GL_LIGHTING);
 }
 
 void drawCoin() {
@@ -115,6 +191,8 @@ void drawCoin() {
 	float angle;
 	float x, y;
 	float step = 2.0f * PI / sides;
+
+	glDisable(GL_LIGHTING);
 
 	glColor3f(1, 0.84, 0.33);
 
@@ -224,6 +302,7 @@ void drawCoin() {
 	glVertex3f(-0.08, 0.02, -0.001);
 
 	glEnd();
+	glEnable(GL_LIGHTING);
 }
 
 void drawFuelTank() {
@@ -311,6 +390,94 @@ void drawFuelTank() {
 	glPopMatrix();
 }
 
+void drawSkybox()
+{
+	glPushAttrib(GL_ENABLE_BIT);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_BLEND);
+	glPushMatrix();
+	glTranslatef(x, 0.0f, z);
+	glScalef(70.0f, 70.0f, 70.0f);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, cityTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBegin(GL_QUADS);
+	// Top face
+	glTexCoord2f(0.0f, 5.0f); glVertex3f(-1.0f, 1.0f, -1.0f);
+	glTexCoord2f(5.0f, 5.0f); glVertex3f(1.0f, 1.0f, -1.0f);
+	glTexCoord2f(5.0f, 0.0f); glVertex3f(1.0f, 1.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1.0f, 1.0f);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, cityTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBegin(GL_QUADS);
+	// Bottom face
+	glTexCoord2f(0.0f, 5.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
+	glTexCoord2f(5.0f, 5.0f); glVertex3f(1.0f, -1.0f, -1.0f);
+	glTexCoord2f(5.0f, 0.0f); glVertex3f(1.0f, -1.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 1.0f);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, cityTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBegin(GL_QUADS);
+	// Front face
+	glTexCoord2f(0.0f, 5.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
+	glTexCoord2f(5.0f, 5.0f); glVertex3f(1.0f, -1.0f, -1.0f);
+	glTexCoord2f(5.0f, 0.0f); glVertex3f(1.0f, 1.0f, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1.0f, -1.0f);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, cityTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBegin(GL_QUADS);
+	// Back face
+	glTexCoord2f(0.0f, 5.0f); glVertex3f(-1.0f, -1.0f, 1.0f);
+	glTexCoord2f(5.0f, 5.0f); glVertex3f(1.0f, -1.0f, 1.0f);
+	glTexCoord2f(5.0f, 0.0f); glVertex3f(1.0f, 1.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1.0f, 1.0f);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, cityTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBegin(GL_QUADS);
+	// Left face
+	glTexCoord2f(0.0f, 5.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
+	glTexCoord2f(5.0f, 5.0f); glVertex3f(-1.0f, 1.0f, -1.0f);
+	glTexCoord2f(5.0f, 0.0f); glVertex3f(-1.0f, 1.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 1.0f);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, cityTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBegin(GL_QUADS);
+	// Right face
+	glTexCoord2f(0.0f, 5.0f); glVertex3f(1.0f, -1.0f, -1.0f);
+	glTexCoord2f(5.0f, 5.0f); glVertex3f(1.0f, 1.0f, -1.0f);
+	glTexCoord2f(5.0f, 0.0f); glVertex3f(1.0f, 1.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.0f, -1.0f, 1.0f);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glPopMatrix();
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glPopAttrib();
+}
+
 
 void renderScene(void)
 {
@@ -328,14 +495,23 @@ void renderScene(void)
 	float visibleRoadStartZ = z - 100.0f;
 	float visibleRoadEndZ = z + 100.0f;
 
+	setLight();
+	drawSkybox();
+	glColor3f(1.0f, 1.0f, 1.0f);
+
 	// Draw gray road in the middle
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, roadTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glColor3f(0.5f, 0.5f, 0.5f);
 	glBegin(GL_QUADS);
-	glVertex3f(-10.0f, 0.0f, visibleRoadStartZ);
-	glVertex3f(-10.0f, 0.0f, visibleRoadEndZ);
-	glVertex3f(10.0f, 0.0f, visibleRoadEndZ);
-	glVertex3f(10.0f, 0.0f, visibleRoadStartZ);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-10.0f, 0.0f, visibleRoadStartZ);
+	glTexCoord2f(20.0f, 0.0f); glVertex3f(-10.0f, 0.0f, visibleRoadEndZ);
+	glTexCoord2f(20.0f, 20.0f); glVertex3f(10.0f, 0.0f, visibleRoadEndZ);
+	glTexCoord2f(0.0f, 20.0f); glVertex3f(10.0f, 0.0f, visibleRoadStartZ);
 	glEnd();
+	glDisable(GL_TEXTURE_2D);
 
 	// Draw intermittent lines on the gray road
 	glColor3f(1.0f, 1.0f, 1.0f); // White color for the lines
@@ -352,22 +528,32 @@ void renderScene(void)
 	}
 	glEnd();
 
-	// Draw green grass on the left side of the road
-	glColor4f(0.0f, 0.5f, 0.0f, 0.8f);
+	// Draw green grass on the left side of the road	
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, grassTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glBegin(GL_QUADS);
-	glVertex3f(-100.0f, 0.0f, visibleRoadStartZ);
-	glVertex3f(-100.0f, 0.0f, visibleRoadEndZ);
-	glVertex3f(-10.0f, 0.0f, visibleRoadEndZ);
-	glVertex3f(-10.0f, 0.0f, visibleRoadStartZ);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-100.0f, 0.0f, visibleRoadStartZ);
+	glTexCoord2f(10.0f, 0.0f); glVertex3f(-100.0f, 0.0f, visibleRoadEndZ);
+	glTexCoord2f(10.0f, 10.0f); glVertex3f(-10.0f, 0.0f, visibleRoadEndZ);
+	glTexCoord2f(0.0f, 10.0f); glVertex3f(-10.0f, 0.0f, visibleRoadStartZ);
 	glEnd();
 
 	// Draw green grass on the right side of the road
+	glBindTexture(GL_TEXTURE_2D, grassTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glColor4f(0.0f, 0.5f, 0.0f, 0.8f);
 	glBegin(GL_QUADS);
-	glVertex3f(10.0f, 0.0f, visibleRoadStartZ);
-	glVertex3f(10.0f, 0.0f, visibleRoadEndZ);
-	glVertex3f(100.0f, 0.0f, visibleRoadEndZ);
-	glVertex3f(100.0f, 0.0f, visibleRoadStartZ);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(10.0f, 0.0f, visibleRoadStartZ);
+	glTexCoord2f(10.0f, 0.0f); glVertex3f(10.0f, 0.0f, visibleRoadEndZ);
+	glTexCoord2f(10.0f, 10.0f); glVertex3f(100.0f, 0.0f, visibleRoadEndZ);
+	glTexCoord2f(0.0f, 10.0f); glVertex3f(100.0f, 0.0f, visibleRoadStartZ);
 	glEnd();
+	glDisable(GL_TEXTURE_2D);
+
+	glDisable(GL_LIGHTING);
 
 	// Draw Flowers
 	for (int i = -62; i < 62; i++) {
@@ -392,6 +578,7 @@ void renderScene(void)
 		glPopMatrix();
 		glPopMatrix();
 	}
+	glEnable(GL_LIGHTING);
 
 	// draw coin - if u want to see it i mean
 	if (visibleRoadEndZ < coinPosZ) {
@@ -451,6 +638,40 @@ void renderScene(void)
 
 	glutPostRedisplay();
 	glutSwapBuffers();
+}
+
+void loadTextures(void) {
+	grassTexture = SOIL_load_OGL_texture
+	(
+		"grass03.png",
+		SOIL_LOAD_RGBA,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_MIPMAPS
+	);
+	roadTexture = SOIL_load_OGL_texture
+	(
+		"road.png",
+		SOIL_LOAD_RGBA,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_MIPMAPS
+	);
+	cityTexture = SOIL_load_OGL_texture
+	(
+		"city.jpg",
+		SOIL_LOAD_RGBA,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_MIPMAPS
+	);
+}
+void enableFog(void) {
+	glEnable(GL_FOG);
+	GLfloat fogColor[] = { 0.8f, 0.8f, 0.8f, 0.05f };
+	glFogfv(GL_FOG_COLOR, fogColor);
+	// Set fog parameters
+	glFogi(GL_FOG_MODE, GL_EXP);
+	glFogf(GL_FOG_DENSITY, 0.03f);
+	glFogf(GL_FOG_START, 100.0f);
+	glFogf(GL_FOG_END, 150.0f);
 }
 
 bool keys[256]; // array to store the state of each key
@@ -524,6 +745,9 @@ int main(int argc, char** argv)
 	glutInitWindowPosition(100, 10);
 	glutInitWindowSize(1200, 768);
 	glutCreateWindow("Very cool 3D car game (nr.1 on steam, overwhelmingly positive reviews)");
+
+	loadTextures();
+	enableFog();
 
 	// OpenGL init
 	glEnable(GL_DEPTH_TEST);
