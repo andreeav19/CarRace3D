@@ -11,6 +11,7 @@ Elemente de retinut:
 #include <string>
 #include <iostream>
 #include "SOIL.h"
+#include <string>
 
 using namespace std;
 // angle of rotation for the camera direction
@@ -512,9 +513,9 @@ void drawSkybox()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glBegin(GL_QUADS);
 	// Top face
-	glTexCoord2f(0.0f, 5.0f); glVertex3f(-1.0f, 1.0f, -1.0f);
-	glTexCoord2f(5.0f, 5.0f); glVertex3f(1.0f, 1.0f, -1.0f);
-	glTexCoord2f(5.0f, 0.0f); glVertex3f(1.0f, 1.0f, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, -1.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0f, 1.0f, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, 1.0f, 1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1.0f, 1.0f);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
@@ -524,9 +525,9 @@ void drawSkybox()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glBegin(GL_QUADS);
 	// Bottom face
-	glTexCoord2f(0.0f, 5.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
-	glTexCoord2f(5.0f, 5.0f); glVertex3f(1.0f, -1.0f, -1.0f);
-	glTexCoord2f(5.0f, 0.0f); glVertex3f(1.0f, -1.0f, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0f, -1.0f, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, -1.0f, 1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 1.0f);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
@@ -536,9 +537,9 @@ void drawSkybox()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glBegin(GL_QUADS);
 	// Front face
-	glTexCoord2f(0.0f, 5.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
-	glTexCoord2f(5.0f, 5.0f); glVertex3f(1.0f, -1.0f, -1.0f);
-	glTexCoord2f(5.0f, 0.0f); glVertex3f(1.0f, 1.0f, -1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0f, -1.0f, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, 1.0f, -1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1.0f, -1.0f);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
@@ -548,9 +549,9 @@ void drawSkybox()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glBegin(GL_QUADS);
 	// Back face
-	glTexCoord2f(0.0f, 5.0f); glVertex3f(-1.0f, -1.0f, 1.0f);
-	glTexCoord2f(5.0f, 5.0f); glVertex3f(1.0f, -1.0f, 1.0f);
-	glTexCoord2f(5.0f, 0.0f); glVertex3f(1.0f, 1.0f, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, -1.0f, 1.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0f, -1.0f, 1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, 1.0f, 1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1.0f, 1.0f);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
@@ -560,9 +561,9 @@ void drawSkybox()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glBegin(GL_QUADS);
 	// Left face
-	glTexCoord2f(0.0f, 5.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
-	glTexCoord2f(5.0f, 5.0f); glVertex3f(-1.0f, 1.0f, -1.0f);
-	glTexCoord2f(5.0f, 0.0f); glVertex3f(-1.0f, 1.0f, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, 1.0f, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, 1.0f, 1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 1.0f);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
@@ -572,9 +573,9 @@ void drawSkybox()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glBegin(GL_QUADS);
 	// Right face
-	glTexCoord2f(0.0f, 5.0f); glVertex3f(1.0f, -1.0f, -1.0f);
-	glTexCoord2f(5.0f, 5.0f); glVertex3f(1.0f, 1.0f, -1.0f);
-	glTexCoord2f(5.0f, 0.0f); glVertex3f(1.0f, 1.0f, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(1.0f, -1.0f, -1.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0f, 1.0f, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, 1.0f, 1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.0f, -1.0f, 1.0f);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
@@ -751,8 +752,37 @@ void renderScene(void)
 	}
 
 	if (carCollision) {
-		// handle collision here
-		exit(1);
+		glDisable(GL_LIGHTING);
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+
+		glColor3f(0.0f, 0.0f, 0.0f);  
+		glRasterPos2f(0.45f, 0.5f);  
+		void* font = GLUT_BITMAP_TIMES_ROMAN_24;  
+		string message = "Game Over";  
+
+		for (char c : message) {
+			glutBitmapCharacter(font, c);  
+		}
+		glRasterPos2f(0.465f, 0.45f);
+		// Set position
+		std::string pointsScore = "Score: " + std::to_string(points);
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(pointsScore.c_str()));
+
+		glPopMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+
+		glutSwapBuffers();  
+		return;  
+		//exit(1);
 	}
 
 	// draw main car
@@ -810,7 +840,7 @@ void loadTextures(void) {
 	);
 	cityTexture = SOIL_load_OGL_texture
 	(
-		"city.jpg",
+		"sky.png",
 		SOIL_LOAD_RGBA,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_MIPMAPS
