@@ -187,10 +187,109 @@ void setLight(void) {
 }
 
 void drawOpposingCar() {
-	glDisable(GL_LIGHTING);
 	glColor3f(0.0f, 0.0f, 1.0f);
-	glutSolidCube(1.5f);
-	glEnable(GL_LIGHTING);
+
+	// Body
+
+	glPushMatrix();
+	glScalef(1.5, 0.5, 3.0);
+	glutSolidCube(1.0f);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.0, 0.4, 0.0);
+	glScalef(1.0, 0.4, 2.0);
+	glutSolidCube(1.0f);
+	glPopMatrix();
+
+	// Wheels
+
+	glColor3f(0.22, 0.23, 0.23);
+	glPushMatrix();
+	glTranslatef(-0.8, -0.25, 0.8);
+	glRotatef(90.0, 0.0, 1.0, 0.0);
+	glutSolidCylinder(0.25, 0.1, 50, 20);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-0.8, -0.25, -0.8);
+	glRotatef(90.0, 0.0, 1.0, 0.0);
+	glutSolidCylinder(0.25, 0.1, 50, 20);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.7, -0.25, 0.8);
+	glRotatef(90.0, 0.0, 1.0, 0.0);
+	glutSolidCylinder(0.25, 0.1, 50, 20);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.7, -0.25, -0.8);
+	glRotatef(90.0, 0.0, 1.0, 0.0);
+	glutSolidCylinder(0.25, 0.1, 50, 20);
+	glPopMatrix();
+
+	// Headlights
+	glColor3f(0.9, 0.82, 0.37);
+
+	glPushMatrix();
+	glTranslatef(0.6, 0.1, 1.5);
+	glutSolidCube(0.2f);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-0.6, 0.1, 1.5);
+	glutSolidCube(0.2f);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.6, 0.1, -1.5);
+	glutSolidCube(0.2f);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-0.6, 0.1, -1.5);
+	glutSolidCube(0.2f);
+	glPopMatrix();
+
+	// Glass
+
+	glColor3f(0.6, 0.92, 0.94);
+
+	glBegin(GL_POLYGON);
+	glVertex3f(-0.4, 0.25, 1.01);
+	glVertex3f(-0.4, 0.55, 1.01);
+	glVertex3f(0.4, 0.55, 1.01);
+	glVertex3f(0.4, 0.25, 1.01);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3f(-0.4, 0.25, -1.01);
+	glVertex3f(-0.4, 0.55, -1.01);
+	glVertex3f(0.4, 0.55, -1.01);
+	glVertex3f(0.4, 0.25, -1.01);
+	glEnd();
+
+
+	glPushMatrix();
+	glRotatef(90, 0.0, 1.0, 0.0);
+	glBegin(GL_POLYGON);
+	glVertex3f(-0.9, 0.25, 0.51);
+	glVertex3f(-0.9, 0.55, 0.51);
+	glVertex3f(0.9, 0.55, 0.51);
+	glVertex3f(0.9, 0.25, 0.51);
+	glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+	glRotatef(90, 0.0, 1.0, 0.0);
+	glBegin(GL_POLYGON);
+	glVertex3f(-0.9, 0.25, -0.51);
+	glVertex3f(-0.9, 0.55, -0.51);
+	glVertex3f(0.9, 0.55, -0.51);
+	glVertex3f(0.9, 0.25, -0.51);
+	glEnd();
+	glPopMatrix();
 }
 
 void drawCoin() {
@@ -624,7 +723,7 @@ void renderScene(void)
 		oppositeCarX = oppositeCarXArr[rand() % 3];
 	}
 	glPushMatrix();
-	glTranslatef(oppositeCarX, 0.1, oppositeCarZ);
+	glTranslatef(oppositeCarX, 0.5, oppositeCarZ);
 	drawOpposingCar();
 	glPopMatrix();
 
