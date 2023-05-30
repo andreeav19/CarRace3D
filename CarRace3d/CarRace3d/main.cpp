@@ -18,6 +18,7 @@ float lx = 0.0f, lz = -1.0f;
 float x = 0.0f, z = 0.0f;
 
 bool carCollision = false;
+bool coinCollision = false;
 
 const char* flowerColors[4] = { "pink", "blue", "red", "purple" };
 const char* color;
@@ -28,6 +29,10 @@ float carRotationAngle = 0;
 float oppositeCarZ = -100;
 float oppositeCarXArr[3] = { -6.5, 0, 6.5 };
 float oppositeCarX = oppositeCarXArr[rand() % 3];
+
+float coinPosX = oppositeCarXArr[rand() % 3];
+float coinPosZ = -50;
+
 
 float PI = 3.14;
 
@@ -389,17 +394,21 @@ void renderScene(void)
 	}
 
 	// draw coin - if u want to see it i mean
+	if (visibleRoadEndZ < coinPosZ) {
+		coinPosZ = visibleRoadStartZ + 10;
+		coinPosX = oppositeCarXArr[rand() % 3];
+	}
 	glPushMatrix();
-	glTranslatef(0, 1.0, -7);
+	glTranslatef(coinPosX, 0.5, coinPosZ);
 	drawCoin();
 	// drawFuelTank();
 
 	//draw oposing car
 	if (z <= 0) {
-		oppositeCarZ += speed + 0.25;
+		oppositeCarZ += speed + 0.2;
 	}
 	else {
-		oppositeCarZ -= speed + 0.25;
+		oppositeCarZ -= speed + 0.2;
 	}
 	glPopMatrix();
 	if (oppositeCarZ > visibleRoadEndZ) {
@@ -417,6 +426,15 @@ void renderScene(void)
 
 	if (abs(oppositeCarZ - z) < 2 && abs(oppositeCarX - x) < 2) {
 		carCollision = true;
+	}
+
+	if (abs(coinPosZ - z) < 2 && abs(coinPosX - x) < 2) {
+		coinCollision = true;
+	}
+
+	if (coinCollision) {
+		// handle coin collision
+		coinCollision = false;
 	}
 
 	if (carCollision) {
