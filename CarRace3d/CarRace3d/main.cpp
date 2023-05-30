@@ -23,6 +23,8 @@ const char* color;
 float speed = 0.2;
 float carRotationAngle = 0;
 
+float PI = 3.14;
+
 void changeSize(int w, int h)
 {
 	// Prevent a divide by zero, when window is too short
@@ -92,6 +94,182 @@ void drawMainCar() {
 	glPopMatrix();
 }
 
+void drawCoin() {
+	float radius = 0.5, height = 0.05, sides = 50;
+	float angle;
+	float x, y;
+	float step = 2.0f * PI / sides;
+
+	glColor3f(1, 0.84, 0.33);
+
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < sides; i++) {
+		angle = i * step;
+		x = 0.15 * cosf(angle);
+		y = 0.20 * sinf(angle);
+		glVertex3f(x, y, 0.0f);
+	}
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < sides; i++) {
+		angle = i * step;
+		x = 0.15 * cosf(angle);
+		y = 0.20 * sinf(angle);
+		glVertex3f(x, y, height);
+	}
+	glEnd();
+
+	glBegin(GL_QUAD_STRIP);
+	for (int i = 0; i <= sides; i++) {
+		angle = i * step;
+		x = 0.15 * cosf(angle);
+		y = 0.20 * sinf(angle);
+		glVertex3f(x, y, 0.0f);
+		glVertex3f(x, y, height);
+	}
+	glEnd();
+
+	glColor3f(0.92, 0.71, 0.17);
+
+	// Draw model on the front of the coin
+
+	glLineWidth(0.2);
+	glBegin(GL_LINE_LOOP);
+	for (int index = 0; index <= sides; index++) {
+		float angle = index * 2.0f * PI / sides;
+		float cx = 0.13 * cosf(angle);
+		float cy = 0.18 * sinf(angle);
+		glVertex3f(cx, cy, height + 0.001);
+	}
+	glEnd();
+
+	// draw crown
+	glBegin(GL_POLYGON);
+	glVertex3f(0, 0, height + 0.001);
+	glVertex3f(-0.08, 0.02, height + 0.001);
+	glVertex3f(-0.04, -0.02, height + 0.001);
+	glVertex3f(0.0, 0.06, height + 0.001);
+	glVertex3f(0.04, -0.02, height + 0.001);
+	glVertex3f(0.08, 0.02, height + 0.001);
+	glVertex3f(0.08, -0.06, height + 0.001);
+	glVertex3f(-0.08, -0.06, height + 0.001);
+	glVertex3f(-0.08, 0.02, height + 0.001);
+
+	glEnd();
+
+	// Draw model on the back of the coin
+
+	glLineWidth(0.2);
+	glBegin(GL_LINE_LOOP);
+	for (int index = 0; index <= sides; index++) {
+		float angle = index * 2.0f * PI / sides;
+		float cx = 0.13 * cosf(angle);
+		float cy = 0.18 * sinf(angle);
+		glVertex3f(cx, cy, -0.001);
+	}
+	glEnd();
+
+	// draw crown
+	glBegin(GL_POLYGON);
+	glVertex3f(0, 0, -0.001);
+	glVertex3f(-0.08, 0.02, -0.001);
+	glVertex3f(-0.04, -0.02, -0.001);
+	glVertex3f(0.0, 0.06, -0.001);
+	glVertex3f(0.04, -0.02, -0.001);
+	glVertex3f(0.08, 0.02, -0.001);
+	glVertex3f(0.08, -0.06, -0.001);
+	glVertex3f(-0.08, -0.06, -0.001);
+	glVertex3f(-0.08, 0.02, -0.001);
+
+	glEnd();
+}
+
+void drawFuelTank() {
+	float height = 0.8f;
+	float sides = 50;
+	float angle;
+	float x, y;
+	float step = 2.0f * PI / sides;
+
+	glColor3f(1, 0.0, 0.0);
+
+	glPushMatrix();
+	glRotatef(90, 1, 0, 0);
+
+	// Draw body
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < sides; i++) {
+		angle = i * step;
+		x = 0.5 * cosf(angle);
+		y = 0.3 * sinf(angle);
+		glVertex3f(x, y, 0.0f);
+	}
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < sides; i++) {
+		angle = i * step;
+		x = 0.5 * cosf(angle);
+		y = 0.3 * sinf(angle);
+		glVertex3f(x, y, height);
+	}
+	glEnd();
+
+	glBegin(GL_QUAD_STRIP);
+	for (int i = 0; i <= sides; i++) {
+		angle = i * step;
+		x = 0.5 * cosf(angle);
+		y = 0.3 * sinf(angle);
+		glVertex3f(x, y, 0.0f);
+		glVertex3f(x, y, height);
+	}
+	glEnd();
+
+
+	// Draw handle
+	glPushMatrix();
+	glTranslatef(0.6, 0, 0.4);
+	glScalef(0.05, 0.05, 0.4);
+	glutSolidCube(1.0f);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.55, 0, 0.2);
+	glScalef(0.15, 0.05, 0.15);
+	glutSolidCube(1.0f);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.55, 0.0, 0.6);
+	glScalef(0.15, 0.05, 0.15);
+	glutSolidCube(1.0f);
+	glPopMatrix();
+
+	// Draw cap
+	glColor3f(0.0, 0.0, 0.0);
+	glPushMatrix();
+	glTranslatef(-0.3, 0.0, -0.1);
+	glutSolidCylinder(0.05, 0.1, 50, 20);
+	glPopMatrix();
+
+	void* font = GLUT_STROKE_ROMAN;
+
+	// Set the size of the letter
+	float letterSize = 0.004;
+
+	// Set the position of the letter
+
+	glPushMatrix();
+	glTranslatef(-0.1, 0.301, 0.6);
+	glRotatef(-90.0, 1.0, 0.0, 0.0);
+	glScalef(letterSize, letterSize, 1.0);
+	glutStrokeCharacter(font, 'F');
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
 
 void renderScene(void)
 {
@@ -119,7 +297,7 @@ void renderScene(void)
 	glColor3f(1.0f, 1.0f, 1.0f); // White color for the lines
 	glLineWidth(3.0f);
 	glBegin(GL_LINES);
-	for (int i = 0; i < 18; i++) {
+	for (int i = 0; i < 28; i++) {
 		// First intermittent line
 		glVertex3f(-3.34, 0.01f, -100.0f + i * 7);
 		glVertex3f(-3.34, 0.01f, -100.0f + i * 7 + 5);
@@ -151,7 +329,7 @@ void renderScene(void)
 	float mi = 0.0; // multiply i
 	for (int c = 0; c < 4; c++) {
 		color = flowerColors[c];
-		mi = mi + 2.0;
+		mi = mi + 5.0;
 		for (int i = -5; i < 5; i++)
 			for (int j = -5; j < 5; j++)
 			{
@@ -167,6 +345,13 @@ void renderScene(void)
 				}
 			}
 	}
+
+	// draw coin - if u want to see it i mean
+	glPushMatrix();
+	glTranslatef(0, 1.0, -7);
+	drawCoin();
+	// drawFuelTank();
+	glPopMatrix();
 
 	// draw main car
 	glPushMatrix();
