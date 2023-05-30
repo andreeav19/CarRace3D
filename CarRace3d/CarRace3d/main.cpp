@@ -17,13 +17,15 @@ float lx = 0.0f, lz = -1.0f;
 // XZ position of the camera
 float x = 0.0f, z = 0.0f;
 
+bool carCollision = false;
+
 const char* flowerColors[4] = { "pink", "blue", "red", "purple" };
 const char* color;
 
 float speed = 0.4;
 float carRotationAngle = 0;
 
-float oppositeCarZ = 0;
+float oppositeCarZ = -100;
 float oppositeCarXArr[3] = { -6.5, 0, 6.5 };
 float oppositeCarX = oppositeCarXArr[rand() % 3];
 
@@ -412,6 +414,15 @@ void renderScene(void)
 	glTranslatef(oppositeCarX, 0.1, oppositeCarZ);
 	drawOpposingCar();
 	glPopMatrix();
+
+	if (abs(oppositeCarZ - z) < 2 && abs(oppositeCarX - x) < 2) {
+		carCollision = true;
+	}
+
+	if (carCollision) {
+		// handle collision here
+		exit(1);
+	}
 
 	// draw main car
 	glPushMatrix();
