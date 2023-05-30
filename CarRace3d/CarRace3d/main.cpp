@@ -20,7 +20,7 @@ float x = 0.0f, z = 5.0f;
 const char* flowerColors[4] = { "pink", "blue", "red", "purple" };
 const char* color;
 
-float speed = 0.0;
+float speed = 0.4;
 float carRotationAngle = 0;
 
 float PI = 3.14;
@@ -325,7 +325,7 @@ void renderScene(void)
 	glColor3f(1.0f, 1.0f, 1.0f); // White color for the lines
 	glLineWidth(3.0f);
 	glBegin(GL_LINES);
-	for (int i = 0; i < 28; i++) {
+	for (int i = -1400; i < 1400; i++) {
 		// First intermittent line
 		glVertex3f(-3.34, 0.01f, -100.0f + i * 7);
 		glVertex3f(-3.34, 0.01f, -100.0f + i * 7 + 5);
@@ -354,24 +354,27 @@ void renderScene(void)
 	glEnd();
 
 	// Draw Flowers
-	float mi = 0.0; // multiply i
-	for (int c = 0; c < 4; c++) {
-		color = flowerColors[c];
-		mi = mi + 5.0;
-		for (int i = -4; i < 5; i++)
-			for (int j = -5; j < 5; j++)
-			{
-				if (i * mi < -10 || i * mi > 10) {
-					glPushMatrix();
-					glTranslatef(i * mi, 0.05f, j * mi);
-					glScalef(0.5, 0.5, 0.5);
-					glRotatef(90.0, 1.0, 0.0, 0.0);
-					drawFlower();
-					glPopMatrix();
-					glPopMatrix();
-					glPopMatrix();
-				}
-			}
+	for (int i = -62; i < 62; i++) {
+		color = flowerColors[(abs(i) % 3 + 3) % 3];
+		glPushMatrix();
+		glTranslatef(13, 0.05f, i * 25);
+		glScalef(0.5, 0.5, 0.5);
+		glRotatef(90.0, 1.0, 0.0, 0.0);
+		drawFlower();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+	}
+	for (int i = -62; i < 62; i++) {
+		color = flowerColors[(abs(i) % 3 + 3) % 3];
+		glPushMatrix();
+		glTranslatef(-13, 0.05f, i * 25);
+		glScalef(0.5, 0.5, 0.5);
+		glRotatef(90.0, 1.0, 0.0, 0.0);
+		drawFlower();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
 	}
 
 	// draw coin - if u want to see it i mean
@@ -402,17 +405,23 @@ void keyboard(unsigned char key, int xx, int yy)
 void keyboardUp(unsigned char key, int x, int y)
 {
 	keys[key] = false; // set the corresponding element to false when a key is released
-	speed = 0;
+	if (key == 'w' || key == 's') {
+		speed = 0;
+	}
 }
 
 void moveCarForwards() {
-	speed = 0.3;
+	if (speed < 0.4) {
+		speed += 0.05;
+	}
 	x += lx * speed;
 	z += lz * speed;
 }
 
 void moveCarBackwards() {
-	speed = 0.3;
+	if (speed < 0.4) {
+		speed += 0.05;
+	}
 	x -= lx * speed;
 	z -= lz * speed;
 }
@@ -443,6 +452,9 @@ void handleKeys()
 	}
 	if (keys['a']) {
 		turnLeft();
+	}
+	if (keys['e'] && speed < 0.8) {
+		speed += 0.05;
 	}
 }
 
